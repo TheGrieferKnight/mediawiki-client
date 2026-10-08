@@ -1,0 +1,32 @@
+name: Main branch source policy
+
+on:
+  pull_request_target:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - edited
+      - ready_for_review
+
+permissions: {}
+
+jobs:
+  dev-source:
+    name: Only dev may merge into main
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+
+    steps:
+      - name: Verify source branch and repository
+        shell: bash
+        run: |
+          if ! jq -e '
+            .pull_request.head.ref == "dev" and
+            .pull_request.head.repo.full_name == .repository.full_name
+          ' "$GITHUB_EVENT_PATH" >/dev/null; then
+            echo "::error::Main accepts PRs only from this repository's dev."
+            exit 1
+          fi

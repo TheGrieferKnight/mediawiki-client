@@ -1,0 +1,83 @@
+[package]
+name = "mediawiki-client"
+version = "0.1.0"
+edition = "2024"
+description = ""
+repository = ""
+license = ""
+
+[lib]
+name = "mediawiki_client"
+path = "src/lib.rs"
+
+[[bin]]
+name = "mediawiki-client"
+path = "src/main.rs"
+required-features = ["cli"]
+
+[dependencies]
+reqwest = {
+  version = "0.13.5",
+  default-features = false,
+  features = ["cookies", "form", "json", "query"],
+}
+
+serde_json = {
+  version = "1.0.151",
+  default-features = false,
+}
+
+thiserror = {
+  version = "2.0.21",
+  default-features = false,
+}
+
+tokio = {
+  version = "1.53.2",
+  default-features = false,
+  features = ["macros", "rt-multi-thread"],
+  optional = true,
+}
+
+tracing = {
+  version = "0.1.44",
+  default-features = false,
+  optional = true,
+}
+
+tracing-subscriber = {
+  version = "0.3.23",
+  default-features = false,
+  features = ["env-filter", "fmt", "json"],
+  optional = true,
+}
+
+[dev-dependencies]
+tokio = {
+  version = "1.53.2",
+  default-features = false,
+  features = ["macros", "rt-multi-thread"],
+}
+
+wiremock = "0.6"
+
+[features]
+default = ["cli", "default-tls"]
+cli = [
+  "dep:tokio",
+  "dep:tracing",
+  "dep:tracing-subscriber",
+]
+default-tls = ["rustls-tls"]
+rustls-tls = ["reqwest/rustls"]
+
+[profile.release]
+opt-level = 3
+debug = 0
+strip = "symbols"
+debug-assertions = false
+overflow-checks = false
+lto = "fat"
+panic = "abort"
+incremental = false
+codegen-units = 1
